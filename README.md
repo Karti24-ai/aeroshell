@@ -1,27 +1,19 @@
-# 🤖 The Autonomous Multi-Language Coding Agent
+﻿# AeroShell 🚀
 
-An advanced, self-healing developer utility that writes **Python** and **JavaScript** code completely from plain English instructions, automatically catches syntax bugs, and refactors itself until it runs perfectly!
+A lightweight, non-sandboxed custom terminal emulator shell engine built natively using Python 3.12. Designed to mimic the minimalist aesthetic of the macOS and UNIX shell environments directly inside a Windows host container.
 
-## 🚀 Key Features
-- 🧠 **Dual-Brain Architecture**: Intelligently switches engines depending on your prompt (Node.js for JS, local interpreter for Python).
-- 🛠️ **Self-Correcting Loop**: Automatically intercepts stack trace errors and feeds them back into the LLM context to fix bugs instantly.
-- 🪟🍏 **Cross-Platform Installer**: Installs natively on both Windows PowerShell and macOS Zsh with a single file execution.
+## Key Features ✨
+- **UNIX-Style Prompt Interface:** Streamlined workspace prompt displaying `user@hostname workspace %` with custom high-contrast Cyan directory path indicators.
+- **Dynamic Package Distribution (`kget`):** An integrated universal software installation framework that resolves local shortcuts or dynamically queries global cloud repositories to install desktop applications seamlessly.
+- **System Telemetry Macros:** Native execution macros including custom hardware configurations and environment context monitors.
+- **Non-Sandboxed Runtime Execution:** Direct binding subsystem that safely pipes standard binary console inputs to the OS kernel without thread latency or execution limits.
 
-## 📦 One-Click Installation
-
-To deploy the agent workspace instantly onto your system, execute the setup command in your terminal environment:
-
-### On Windows (PowerShell):
+## Production Installation 🛠️
 ```powershell
-py install.py
-```
+# Clone the repository asset files
+git clone https://github.com
+cd aeroshell
 
-### On macOS/Linux (Terminal):
-```bash
-python3 install.py
-```
-
-Once deployment prints `🎉 SUCCESS`, restart your terminal session and simply launch your workspace by typing:
-```bash
-agent
+# Compile natively into a standalone desktop application executable (.exe)
+python -m PyInstaller --onefile --console aeroshell.py
 ```
