@@ -15,16 +15,18 @@ class AeroShell:
     def __init__(self):
         self.username = os.getlogin()
         self.hostname = platform.node()
-        self.active_directory = os.getcwd()
+        self.active_directory = os.path.expanduser("~")
+        os.chdir(self.active_directory)
         
     def render_welcome_banner(self):
         os.system('cls' if os.name == 'nt' else 'clear')
         current_time = datetime.now().strftime('%a %b %d %H:%M:%S')
         print(f"Last login: {current_time} on ttys000")
-        print(f"AeroShell Environment Core {COLOR_CYAN}v1.4.1{COLOR_RESET}")
+        print(f"AeroShell Environment Core {COLOR_CYAN}v1.4.3{COLOR_RESET}")
         print("Type 'help' for internal system commands or 'kget [app]' for global downloads.\n")
 
     def handle_custom_installer(self, app_name: str):
+        """Dynamic package manager that intercepts text and strips Microsoft branding"""
         app_database = {
             "chrome": "Google.Chrome",
             "python": "Python.Python.3.12",
@@ -40,16 +42,33 @@ class AeroShell:
         winget_target = app_database[target_app] if target_app in app_database else app_name
         
         print(f"\n{COLOR_GREEN}==> kget: Initiating global distribution query for target: '{winget_target}'{COLOR_RESET}")
-        print(f"{COLOR_GREEN}==> kget: Contacting remote repositories...{COLOR_RESET}")
+        print(f"{COLOR_GREEN}==> kget: Contacting remote repositories...{COLOR_RESET}\n")
         
         try:
-            subprocess.run([
-                "winget", "install", winget_target, 
-                "--silent", "--accept-source-agreements", "--accept-package-agreements"
-            ], check=True)
-            print(f"{COLOR_GREEN}==> kget: Target '{app_name}' successfully installed onto this machine.{COLOR_RESET}\n")
+            # Run winget natively but capture the console text stream instead of printing it blindly
+            process = subprocess.Popen(
+                ["winget", "install", winget_target, "--silent", "--accept-source-agreements", "--accept-package-agreements"],
+                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, errors="ignore"
+            )
+            
+            # Read the output line-by-line in real time
+            while True:
+                line = process.stdout.readline()
+                if not line and process.poll() is not None:
+                    break
+                if line:
+                    # Target Microsoft's legal disclaimer line and dynamically replace it with KGet!
+                    if "Microsoft is not responsible" in line:
+                        line = line.replace("Microsoft is not responsible", "KGet is not responsible")
+                    print(line, end="")
+                    
+            if process.returncode == 0:
+                print(f"\n{COLOR_GREEN}==> kget: Target '{app_name}' successfully installed onto this machine.{COLOR_RESET}\n")
+            else:
+                print(f"\n{COLOR_RED}Error: Global installation pipeline closed with code {process.returncode}{COLOR_RESET}\n")
+                
         except Exception as e:
-            print(f"{COLOR_RED}Error: Global installation pipeline failed or app not found: {e}{COLOR_RESET}\n")
+            print(f"{COLOR_RED}Error: Global installation pipeline failed: {e}{COLOR_RESET}\n")
 
     def execute_system_command(self, raw_input_string: str):
         tokens = raw_input_string.strip().split()
@@ -86,7 +105,7 @@ class AeroShell:
         elif command_key == "neofetch":
             print(f"\n   /\\_/\\_      {COLOR_BOLD}OS:{COLOR_RESET} {platform.system()} {platform.release()}")
             print(f"  ( o.o )     {COLOR_BOLD}Kernel:{COLOR_RESET} {platform.version()}")
-            print(f"   > ^ <      {COLOR_BOLD}Shell:{COLOR_RESET} AeroShell Core v1.4.1")
+            print(f"   > ^ <      {COLOR_BOLD}Shell:{COLOR_RESET} AeroShell Core v1.4.3")
             print(f"  /     \\     {COLOR_BOLD}Uptime:{COLOR_RESET} Local machine runtime sync active")
             print(f" |       |    {COLOR_BOLD}User Context:{COLOR_RESET} {self.username}@{self.hostname}\n")
             return
